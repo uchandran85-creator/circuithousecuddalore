@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Government Circuit House – Cuddalore</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #0a1628;
+    --gold: #c9a84c;
+    --cream: #faf8f2;
+    --green: #1a5c2a;
+    --grey: #6b7280;
+    --border: #d4c89a;
+    --suit-bg: #fff8e7;
+    --ac-bg: #e8f4fb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Lato', sans-serif; background: var(--cream); color: var(--navy); min-height: 100vh; }
+
+  /* HEADER */
+  header { background: var(--navy); position: relative; overflow: hidden; }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(201,168,76,0.04) 40px,rgba(201,168,76,0.04) 41px);
+  }
+  .header-inner { max-width: 1160px; margin: auto; padding: 18px 24px; display: flex; align-items: center; gap: 18px; position: relative; flex-wrap: wrap; }
+  .emblem { width: 62px; height: 62px; border-radius: 50%; background: radial-gradient(circle at 40% 35%,#fff8e0,#c9a84c); display: flex; align-items: center; justify-content: center; font-size: 28px; border: 3px solid var(--gold); flex-shrink: 0; box-shadow: 0 0 20px rgba(201,168,76,0.4); }
+  .header-text h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.35rem; letter-spacing: 0.02em; }
+  .header-text p { color: rgba(255,255,255,0.65); font-size: 0.78rem; letter-spacing: 0.06em; margin-top: 2px; }
+  .lang-toggle { margin-left: auto; display: flex; background: rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; border: 1px solid rgba(201,168,76,0.3); }
+  .lang-toggle button { padding: 7px 16px; border: none; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.82rem; font-family: 'Lato', sans-serif; transition: all 0.2s; }
+  .lang-toggle button.active { background: var(--gold); color: var(--navy); font-weight: 700; }
+
+  /* NAV TABS */
+  .nav-tabs { background: #fff; border-bottom: 2px solid var(--border); }
+  .nav-tabs-inner { max-width: 1160px; margin: auto; display: flex; gap: 0; padding: 0 24px; }
+  .nav-tab { padding: 14px 28px; border: none; background: transparent; font-family: 'Lato', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--grey); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; letter-spacing: 0.02em; }
+  .nav-tab.active { color: var(--navy); border-bottom-color: var(--gold); }
+  .nav-tab:hover:not(.active) { color: var(--navy); background: #faf8f2; }
+
+  /* CONTAINER */
+  .container { max-width: 1160px; margin: auto; padding: 28px 20px 60px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .section-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--gold), transparent); }
+
+  /* STATS BAR */
+  .stats-bar { display: flex; gap: 14px; margin-bottom: 26px; flex-wrap: wrap; }
+  .stat-card { flex: 1; min-width: 130px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 0.72rem; color: var(--grey); letter-spacing: 0.05em; font-weight: 600; text-transform: uppercase; }
+  .stat-card.gold-card { border-color: var(--gold); background: var(--suit-bg); }
+  .stat-card.blue-card { border-color: #3a8fc1; background: var(--ac-bg); }
+  .stat-card.red-card { border-color: #dc2626; background: #fff5f5; }
+  .stat-card.green-card { border-color: #16a34a; background: #f0fdf4; }
+
+  /* ── AVAILABILITY DASHBOARD ── */
+  .avail-dashboard { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 26px; box-shadow: 0 4px 24px rgba(10,22,40,0.05); }
+  .floor-block { margin-bottom: 28px; }
+  .floor-block:last-child { margin-bottom: 0; }
+  .floor-label {
+    font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #fff; background: var(--navy); display: inline-block;
+    padding: 4px 14px; border-radius: 20px; margin-bottom: 14px;
+  }
+  .avail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .avail-room {
+    border-radius: 12px; padding: 16px 14px; position: relative;
+    border: 2px solid transparent; transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .avail-room.suit-free { background: var(--suit-bg); border-color: #e0c97a; }
+  .avail-room.ac-free   { background: var(--ac-bg);   border-color: #9ac8e0; }
+  .avail-room.suit-occ  { background: #fff0f0; border-color: #fca5a5; }
+  .avail-room.ac-occ    { background: #fff0f0; border-color: #fca5a5; }
+  .avail-room-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .avail-room-num { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; color: var(--navy); line-height: 1; }
+  .avail-status-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; }
+  .dot-free { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+  .dot-occ  { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+  .avail-type-badge { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; padding: 2px 8px; border-radius: 20px; display: inline-block; }
+  .badge-suit { background: var(--gold); color: var(--navy); }
+  .badge-ac   { background: #3a8fc1; color: #fff; }
+  .avail-guest { font-size: 0.78rem; color: #444; font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .avail-dates { font-size: 0.7rem; color: var(--grey); }
+  .avail-free-label { font-size: 0.82rem; color: #16a34a; font-weight: 700; }
+  .vacate-btn {
+    margin-top: 6px; padding: 5px 10px; border-radius: 6px; border: none;
+    background: #fee2e2; color: #991b1b; font-size: 0.72rem; font-weight: 700;
+    cursor: pointer; font-family: 'Lato', sans-serif; letter-spacing: 0.03em;
+    transition: background 0.15s; align-self: flex-start;
+  }
+  .vacate-btn:hover { background: #fecaca; }
+
+  /* LEGEND */
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 18px; font-size: 0.82rem; }
+  .legend span { display: flex; align-items: center; gap: 7px; }
+  .ldot { width: 11px; height: 11px; border-radius: 3px; }
+  .ldot-suit { background: var(--gold); }
+  .ldot-ac   { background: #3a8fc1; }
+  .ldot-occ  { background: #ef4444; }
+  .ldot-free { background: #22c55e; }
+
+  /* FORM */
+  .form-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 26px; margin-bottom: 26px; box-shadow: 0 4px 24px rgba(10,22,40,0.06); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .avail-grid { grid-template-columns: 1fr 1fr; } }
+  label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--grey); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+  input, select, textarea { width: 100%; padding: 10px 13px; border: 1.5px solid #d4c89a; border-radius: 7px; font-family: 'Lato', sans-serif; font-size: 0.93rem; color: var(--navy); background: #fff; transition: border-color 0.2s; outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.15); }
+  .full-col { grid-column: 1 / -1; }
+
+  /* ROOM SELECTOR GRID */
+  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .room-card { border-radius: 11px; padding: 16px 14px; cursor: pointer; border: 2.5px solid transparent; transition: all 0.2s; position: relative; user-select: none; }
+  .room-card.suit { background: var(--suit-bg); border-color: #e0c97a; }
+  .room-card.ac   { background: var(--ac-bg);   border-color: #9ac8e0; }
+  .room-card:hover:not(.occupied) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .room-card.selected.suit { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.25); }
+  .room-card.selected.ac   { border-color: #3a8fc1; box-shadow: 0 0 0 3px rgba(58,143,193,0.25); }
+  .room-card.occupied { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.4); }
+  .room-badge { display: inline-block; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; padding: 2px 8px; border-radius: 20px; margin-bottom: 8px; }
+  .suit .room-badge { background: var(--gold); color: var(--navy); }
+  .ac .room-badge   { background: #3a8fc1; color: #fff; }
+  .room-number { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; color: var(--navy); line-height: 1; margin-bottom: 2px; }
+  .room-lbl { font-size: 0.75rem; color: var(--grey); }
+  .room-wing { position: absolute; top: 10px; right: 12px; font-size: 0.66rem; font-weight: 700; color: var(--grey); }
+  .check-icon { position: absolute; bottom: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; opacity: 0; transition: opacity 0.2s; }
+  .selected .check-icon { opacity: 1; }
+  .suit .check-icon { background: var(--gold); color: var(--navy); }
+  .ac .check-icon   { background: #3a8fc1; color: #fff; }
+  .occ-tag { position: absolute; bottom: 8px; right: 8px; font-size: 0.62rem; font-weight: 700; background: #dc2626; color: #fff; padding: 2px 7px; border-radius: 10px; }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+  .btn { padding: 11px 26px; border-radius: 8px; font-family: 'Lato', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; border: none; letter-spacing: 0.04em; transition: all 0.2s; }
+  .btn-primary  { background: var(--gold); color: var(--navy); }
+  .btn-primary:hover  { background: #b8923e; }
+  .btn-secondary { background: var(--navy); color: #fff; }
+  .btn-secondary:hover { background: #1a2d4a; }
+  .btn-print { background: var(--green); color: #fff; }
+  .btn-print:hover { background: #14472a; }
+
+  /* NOTICE */
+  .notice { background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid var(--gold); border-radius: 8px; padding: 11px 15px; font-size: 0.84rem; color: #92400e; margin-bottom: 20px; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; border-radius: 11px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+  thead { background: var(--navy); color: #fff; }
+  thead th { padding: 11px 13px; text-align: left; font-weight: 600; letter-spacing: 0.04em; font-size: 0.75rem; }
+  tbody tr { border-bottom: 1px solid #f0e8cc; }
+  tbody tr:last-child { border: none; }
+  tbody tr:hover { background: #faf5e8; }
+  tbody td { padding: 10px 13px; vertical-align: middle; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+  .tag-suit { background: #fef3c7; color: #92400e; }
+  .tag-ac   { background: #dbeafe; color: #1e40af; }
+  .tag-vac  { background: #dcfce7; color: #166534; }
+  .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+  .icon-btn { padding: 5px 9px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 700; transition: all 0.15s; font-family: 'Lato', sans-serif; white-space: nowrap; }
+
+  /* VACATE MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 16px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 14px; max-width: 730px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal-header { padding: 16px 22px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: var(--navy); border-radius: 14px 14px 0 0; }
+  .modal-header h2 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.05rem; }
+  .modal-close { background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; line-height: 1; }
+  .modal-body { padding: 22px; }
+
+  /* VACATE CONFIRM MODAL */
+  #vacate-modal .modal-body { text-align: center; }
+  #vacate-modal .v-room-num { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: var(--navy); }
+  #vacate-modal .v-guest { font-size: 1.1rem; color: var(--grey); margin: 6px 0 18px; }
+  #vacate-modal .v-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+
+  /* PRINT DOC */
+  #print-doc { font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.7; color: #000; }
+  .print-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 16px; }
+  .print-header .office-name { font-size: 15pt; font-weight: bold; letter-spacing: 0.05em; }
+  .print-header .sub-name { font-size: 12pt; margin-top: 3px; }
+  .print-header .ref-date { font-size: 10pt; margin-top: 8px; text-align: right; }
+  .print-title { text-align: center; font-size: 14pt; font-weight: bold; text-decoration: underline; margin: 14px 0; letter-spacing: 0.06em; }
+  .print-body p { margin: 7px 0; }
+  .print-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 11pt; }
+  .print-table th, .print-table td { border: 1px solid #000; padding: 6px 10px; }
+  .print-table th { background: #f5f5f5; font-weight: bold; text-align: center; }
+  .print-table td { text-align: center; }
+  .print-table td:nth-child(2) { text-align: left; }
+  .print-sign { margin-top: 40px; text-align: right; }
+  .print-sign .sign-title { font-weight: bold; font-size: 11pt; }
+  .print-sign .sign-office { font-size: 10.5pt; }
+  .print-footer { margin-top: 22px; font-size: 9pt; border-top: 1px solid #aaa; padding-top: 8px; color: #444; }
+  .preview-actions { display: flex; gap: 12px; margin-top: 18px; justify-content: flex-end; padding-top: 14px; border-top: 1px solid #eee; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #print-doc, #print-doc * { visibility: visible; }
+    #print-doc { position: fixed; inset: 0; padding: 28px 36px; background: #fff; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="emblem">🏛️</div>
+    <div class="header-text">
+      <h1 id="h-title">Government Circuit House, Cuddalore</h1>
+      <p id="h-sub">Cuddalore District &nbsp;|&nbsp; Room Management System</p>
+    </div>
+    <div class="lang-toggle">
+      <button class="active" onclick="setLang('en')">English</button>
+      <button onclick="setLang('ta')">தமிழ்</button>
+    </div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tabs-inner">
+    <button class="nav-tab active" id="tab-dashboard" onclick="showPage('dashboard')">📊 <span id="tabl-dash">Availability Dashboard</span></button>
+    <button class="nav-tab" id="tab-booking" onclick="showPage('booking')">➕ <span id="tabl-book">New Booking</span></button>
+    <button class="nav-tab" id="tab-bookings" onclick="showPage('bookings')">📋 <span id="tabl-list">Bookings List</span></button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ══════════════════════════════════════════
+       PAGE 1 — AVAILABILITY DASHBOARD
+  ══════════════════════════════════════════ -->
+  <div class="page active" id="page-dashboard">
+
+    <div class="stats-bar">
+      <div class="stat-card gold-card"><div class="stat-num" id="stat-suit">4</div><div class="stat-label" id="lbl-suit-rooms">Suit Rooms</div></div>
+      <div class="stat-card blue-card"><div class="stat-num" id="stat-ac">4</div><div class="stat-label" id="lbl-ac-rooms">AC Rooms</div></div>
+      <div class="stat-card red-card"><div class="stat-num" id="stat-booked">0</div><div class="stat-label" id="lbl-occupied">Occupied</div></div>
+      <div class="stat-card green-card"><div class="stat-num" id="stat-free">8</div><div class="stat-label" id="lbl-available">Available</div></div>
+    </div>
+
+    <div class="avail-dashboard">
+      <div id="t-avail" class="section-title">Room Availability — Live View</div>
+
+      <div class="legend">
+        <span><div class="ldot ldot-free"></div> <span id="leg-free">Available</span></span>
+        <span><div class="ldot ldot-occ"></div>  <span id="leg-occ">Occupied</span></span>
+        <span><div class="ldot ldot-suit"></div> <span id="leg-suit">Suit Room</span></span>
+        <span><div class="ldot ldot-ac"></div>   <span id="leg-ac">AC Room</span></span>
+      </div>
+
+      <!-- Ground Floor -->
+      <div class="floor-block">
+        <div class="floor-label" id="fl-ground">🏠 Ground Floor</div>
+        <div class="avail-grid" id="avail-ground"></div>
+      </div>
+
+      <!-- First Floor -->
+      <div class="floor-block">
+        <div class="floor-label" id="fl-first">🏢 First Floor</div>
+        <div class="avail-grid" id="avail-first"></div>
+      </div>
+    </div>
+
+  </div><!-- /page-dashboard -->
+
+  <!-- ══════════════════════════════════════════
+       PAGE 2 — NEW BOOKING
+  ══════════════════════════════════════════ -->
+  <div class="page" id="page-booking">
+
+    <div id="t-rooms" class="section-title">Select a Room</div>
+    <div class="legend">
+      <span><div class="ldot ldot-suit"></div> <span id="leg-suit2">Suit Room</span></span>
+      <span><div class="ldot ldot-ac"></div>   <span id="leg-ac2">AC Room</span></span>
+      <span><div class="ldot ldot-occ"></div>  <span id="leg-occ2">Occupied</span></span>
+    </div>
+    <div class="rooms-grid" id="rooms-grid"></div>
+
+    <div class="form-card">
+      <div id="t-booking" class="section-title">Guest Details</div>
+      <div class="notice" id="notice-text">⚠️ Select a room above, then fill in visitor details below.</div>
+      <div class="form-grid">
+        <div><label id="lbl-visitor">Visitor Name</label><input type="text" id="f-visitor" placeholder="Enter visitor name"/></div>
+        <div><label id="lbl-designation">Designation / Rank</label><input type="text" id="f-designation" placeholder="e.g. IAS Officer, MLA"/></div>
+        <div><label id="lbl-purpose">Purpose of Visit</label><input type="text" id="f-purpose" placeholder="Official / Inspection / Review"/></div>
+        <div><label id="lbl-contact">Contact Number</label><input type="tel" id="f-contact" placeholder="Mobile number"/></div>
+        <div><label id="lbl-checkin">Check-in Date &amp; Time</label><input type="datetime-local" id="f-checkin"/></div>
+        <div><label id="lbl-checkout">Check-out Date &amp; Time</label><input type="datetime-local" id="f-checkout"/></div>
+        <div class="full-col"><label id="lbl-remarks">Remarks</label><textarea id="f-remarks" rows="2" placeholder="Any special requirements"></textarea></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="addBooking()" id="btn-book">➕ Book Room</button>
+        <button class="btn btn-secondary" onclick="clearForm()" id="btn-clear">🔄 Clear</button>
+      </div>
+    </div>
+
+  </div><!-- /page-booking -->
+
+  <!-- ══════════════════════════════════════════
+       PAGE 3 — BOOKINGS LIST
+  ══════════════════════════════════════════ -->
+  <div class="page" id="page-bookings">
+    <div id="t-bookings" class="section-title">Current Bookings</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th id="th-sno">S.No</th>
+            <th id="th-room">Room</th>
+            <th id="th-type">Type</th>
+            <th id="th-floor">Floor</th>
+            <th id="th-vname">Visitor</th>
+            <th id="th-desig">Designation</th>
+            <th id="th-cin">Check-in</th>
+            <th id="th-cout">Check-out</th>
+            <th id="th-status">Status</th>
+            <th id="th-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookings-body">
+          <tr><td colspan="10" style="text-align:center;color:#aaa;padding:28px" id="no-bookings-msg">No bookings yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- /page-bookings -->
+
+</div><!-- /container -->
+
+<!-- ══ PRINT MODAL ══ -->
+<div class="modal-overlay" id="print-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">📄 Booking Order Preview</h2>
+      <button class="modal-close" onclick="closeModal('print-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="print-doc"></div>
+      <div class="preview-actions">
+        <button class="btn btn-secondary" onclick="closeModal('print-modal')" id="btn-close-modal">Close</button>
+        <button class="btn btn-print" onclick="window.print()" id="btn-do-print">🖨️ Print Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VACATE CONFIRM MODAL ══ -->
+<div class="modal-overlay" id="vacate-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h2 id="vm-title">🚪 Vacate Room</h2>
+      <button class="modal-close" onclick="closeModal('vacate-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="v-room-num" id="vm-room"></div>
+      <div class="v-guest" id="vm-guest"></div>
+      <p id="vm-msg" style="font-size:0.9rem;color:#444;line-height:1.6"></p>
+      <div class="v-actions">
+        <button class="btn btn-secondary" onclick="closeModal('vacate-modal')" id="vm-cancel">Cancel</button>
+        <button class="btn" style="background:#dc2626;color:#fff" id="vm-confirm" onclick="confirmVacate()">✅ Confirm Vacate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  ROOM DATA — corrected floors
+// ══════════════════════════════════════════════
+const ROOMS = [
+  { id:'N1', type:'suit', floor:'ground', wing:'N-Wing' },
+  { id:'N2', type:'ac',   floor:'ground', wing:'N-Wing' },
+  { id:'N3', type:'ac',   floor:'ground', wing:'N-Wing' },
+  { id:'N4', type:'suit', floor:'ground', wing:'N-Wing' },
+  { id:'G1', type:'suit', floor:'ground', wing:'G-Wing' },
+  { id:'G2', type:'ac',   floor:'ground', wing:'G-Wing' },
+  { id:'G3', type:'ac',   floor:'first',  wing:'G-Wing' },
+  { id:'G4', type:'suit', floor:'first',  wing:'G-Wing' },
+];
+
+let bookings = JSON.parse(localStorage.getItem('ch-bookings2') || '[]');
+let selectedRoom = null;
+let lang = 'en';
+let editId = null;
+let vacateId = null;
+
+// ══════════════════════════════════════════════
+//  TRANSLATIONS
+// ══════════════════════════════════════════════
+const T = {
+  en: {
+    'h-title':'Government Circuit House, Cuddalore',
+    'h-sub':'Cuddalore District | Room Management System',
+    'tabl-dash':'Availability Dashboard','tabl-book':'New Booking','tabl-list':'Bookings List',
+    't-avail':'Room Availability — Live View',
+    'fl-ground':'🏠 Ground Floor','fl-first':'🏢 First Floor',
+    'lbl-suit-rooms':'Suit Rooms','lbl-ac-rooms':'AC Rooms','lbl-occupied':'Occupied','lbl-available':'Available',
+    'leg-free':'Available','leg-occ':'Occupied','leg-suit':'Suit Room','leg-ac':'AC Room',
+    'leg-suit2':'Suit Room','leg-ac2':'AC Room','leg-occ2':'Occupied',
+    't-rooms':'Select a Room','t-booking':'Guest Details','t-bookings':'Current Bookings',
+    'lbl-visitor':'Visitor Name','lbl-designation':'Designation / Rank','lbl-purpose':'Purpose of Visit',
+    'lbl-contact':'Contact Number','lbl-checkin':'Check-in Date & Time','lbl-checkout':'Check-out Date & Time',
+    'lbl-remarks':'Remarks',
+    'btn-book':'➕ Book Room','btn-clear':'🔄 Clear',
+    'notice-text':'⚠️ Select a room above, then fill in visitor details below.',
+    'th-sno':'S.No','th-room':'Room','th-type':'Type','th-floor':'Floor',
+    'th-vname':'Visitor','th-desig':'Designation','th-cin':'Check-in','th-cout':'Check-out',
+    'th-status':'Status','th-actions':'Actions',
+    'no-bookings-msg':'No bookings yet.',
+    'modal-title':'📄 Booking Order Preview','btn-close-modal':'Close','btn-do-print':'🖨️ Print Order',
+    'vm-title':'🚪 Vacate Room','vm-cancel':'Cancel',
+    'suit-badge':'SUIT ROOM','ac-badge':'AC ROOM','occ-label':'OCCUPIED',
+    'btn-vacate':'Vacate','btn-print':'Print','btn-edit':'Edit','btn-delete':'Delete',
+    'status-active':'Active','status-vacated':'Vacated',
+    'select-notice': r => `✅ Room ${r} selected. Fill details below.`,
+    'vacate-msg': b => `Guest "${b.visitor}" will be checked out from Room ${b.room}. This will mark the room as available.`,
+    'floor-ground':'Ground Floor','floor-first':'First Floor',
+    'free-label':'Available',
+  },
+  ta: {
+    'h-title':'அரசு சர்க்கீட் ஹவுஸ், கடலூர்',
+    'h-sub':'கடலூர் மாவட்டம் | அறை மேலாண்மை அமைப்பு',
+    'tabl-dash':'கிடைக்கும் நிலை','tabl-book':'புதிய முன்பதிவு','tabl-list':'முன்பதிவு பட்டியல்',
+    't-avail':'அறை கிடைக்கும் நிலை — நேரடி காட்சி',
+    'fl-ground':'🏠 தரை தளம்','fl-first':'🏢 முதல் தளம்',
+    'lbl-suit-rooms':'சூட் அறைகள்','lbl-ac-rooms':'ஏசி அறைகள்','lbl-occupied':'ஆக்கிரமிக்கப்பட்டது','lbl-available':'கிடைக்கும்',
+    'leg-free':'கிடைக்கும்','leg-occ':'நிரம்பியது','leg-suit':'சூட் அறை','leg-ac':'ஏசி அறை',
+    'leg-suit2':'சூட் அறை','leg-ac2':'ஏசி அறை','leg-occ2':'நிரம்பியது',
+    't-rooms':'அறையை தேர்ந்தெடு','t-booking':'விருந்தினர் விவரங்கள்','t-bookings':'தற்போதைய முன்பதிவுகள்',
+    'lbl-visitor':'பார்வையாளர் பெயர்','lbl-designation':'பதவி / தரம்','lbl-purpose':'வருகையின் நோக்கம்',
+    'lbl-contact':'தொடர்பு எண்','lbl-checkin':'வருகை தேதி & நேரம்','lbl-checkout':'புறப்படும் தேதி & நேரம்',
+    'lbl-remarks':'குறிப்புகள்',
+    'btn-book':'➕ அறை முன்பதிவு செய்','btn-clear':'🔄 அழி',
+    'notice-text':'⚠️ மேலே ஒரு அறையை தேர்ந்தெடுத்து, கீழே பார்வையாளர் விவரங்களை நிரப்பவும்.',
+    'th-sno':'வ.எண்','th-room':'அறை','th-type':'வகை','th-floor':'தளம்',
+    'th-vname':'பார்வையாளர்','th-desig':'பதவி','th-cin':'வருகை','th-cout':'புறப்படுதல்',
+    'th-status':'நிலை','th-actions':'செயல்கள்',
+    'no-bookings-msg':'இன்னும் முன்பதிவுகள் இல்லை.',
+    'modal-title':'📄 முன்பதிவு ஆணை முன்னோட்டம்','btn-close-modal':'மூடு','btn-do-print':'🖨️ ஆணையை அச்சிடு',
+    'vm-title':'🚪 அறை காலி செய்','vm-cancel':'ரத்து செய்',
+    'suit-badge':'சூட் அறை','ac-badge':'ஏசி அறை','occ-label':'நிரம்பியது',
+    'btn-vacate':'காலி செய்','btn-print':'அச்சு','btn-edit':'திருத்து','btn-delete':'நீக்கு',
+    'status-active':'செயலில்','status-vacated':'காலி செய்யப்பட்டது',
+    'select-notice': r => `✅ அறை ${r} தேர்ந்தெடுக்கப்பட்டது. கீழே நிரப்பவும்.`,
+    'vacate-msg': b => `"${b.visitor}" (அறை ${b.room}) காலி செய்யப்படும். அறை கிடைக்கும் நிலைக்கு மாறும்.`,
+    'floor-ground':'தரை தளம்','floor-first':'முதல் தளம்',
+    'free-label':'கிடைக்கும்',
+  }
+};
+function t(key){ return (T[lang][key] !== undefined ? T[lang][key] : (T.en[key] || key)); }
+
+// ══════════════════════════════════════════════
+//  TABS / PAGES
+// ══════════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard') renderDashboard();
+  if(name==='bookings')  renderBookings();
+  if(name==='booking')   renderRooms();
+}
+
+// ══════════════════════════════════════════════
+//  LANGUAGE
+// ══════════════════════════════════════════════
+function setLang(l){
+  lang=l;
+  document.querySelectorAll('.lang-toggle button').forEach((b,i)=>{
+    b.classList.toggle('active',(i===0&&l==='en')||(i===1&&l==='ta'));
+  });
+  applyTranslations();
+  renderDashboard();
+  renderRooms();
+  renderBookings();
+}
+function applyTranslations(){
+  const ids=['h-title','h-sub','tabl-dash','tabl-book','tabl-list','t-avail','fl-ground','fl-first',
+    'lbl-suit-rooms','lbl-ac-rooms','lbl-occupied','lbl-available',
+    'leg-free','leg-occ','leg-suit','leg-ac','leg-suit2','leg-ac2','leg-occ2',
+    't-rooms','t-booking','t-bookings',
+    'lbl-visitor','lbl-designation','lbl-purpose','lbl-contact','lbl-checkin','lbl-checkout','lbl-remarks',
+    'btn-book','btn-clear','notice-text',
+    'th-sno','th-room','th-type','th-floor','th-vname','th-desig','th-cin','th-cout','th-status','th-actions',
+    'no-bookings-msg','modal-title','btn-close-modal','btn-do-print','vm-title','vm-cancel'];
+  ids.forEach(k=>{ const el=document.getElementById(k); if(el) el.innerHTML=t(k); });
+  const ph={
+    'f-visitor': lang==='ta'?'பார்வையாளர் பெயர்':'Enter visitor name',
+    'f-designation': lang==='ta'?'எ.கா. IAS அதிகாரி':'e.g. IAS Officer, MLA',
+    'f-purpose': lang==='ta'?'அலுவல் / ஆய்வு':'Official / Inspection / Review',
+    'f-contact': lang==='ta'?'கைபேசி எண்':'Mobile number',
+    'f-remarks': lang==='ta'?'சிறப்பு தேவைகள்':'Any special requirements',
+  };
+  Object.entries(ph).forEach(([id,p])=>{ const el=document.getElementById(id); if(el) el.placeholder=p; });
+}
+
+// ══════════════════════════════════════════════
+//  DASHBOARD RENDER
+// ══════════════════════════════════════════════
+function renderDashboard(){
+  const activeBookings = bookings.filter(b=>b.status!=='vacated');
+  const occupied = activeBookings.map(b=>b.room);
+  const ground = ROOMS.filter(r=>r.floor==='ground');
+  const first  = ROOMS.filter(r=>r.floor==='first');
+
+  function makeCard(r){
+    const bk = activeBookings.find(b=>b.room===r.id);
+    const isOcc = !!bk;
+    const typeClass = r.type+(isOcc?'-occ':'-free');
+    const badge = r.type==='suit'
+      ? `<span class="avail-type-badge badge-suit">${t('suit-badge')}</span>`
+      : `<span class="avail-type-badge badge-ac">${t('ac-badge')}</span>`;
+    const floorTa = r.floor==='ground'?t('floor-ground'):t('floor-first');
+    const guestInfo = isOcc ? `
+      <div class="avail-guest">👤 ${bk.visitor}</div>
+      <div class="avail-dates">📅 ${fmtDate(bk.checkin)} → ${fmtDate(bk.checkout)}</div>
+      <button class="vacate-btn" onclick="openVacate('${bk.id}')">🚪 ${t('btn-vacate')}</button>
+    ` : `<div class="avail-free-label">✅ ${t('free-label')}</div>`;
+    return `
+    <div class="avail-room ${typeClass}">
+      <div class="avail-room-top">
+        <div class="avail-room-num">${r.id}</div>
+        <div class="avail-status-dot ${isOcc?'dot-occ':'dot-free'}"></div>
+      </div>
+      ${badge}
+      <div style="font-size:0.7rem;color:var(--grey)">${r.wing} · ${floorTa}</div>
+      ${guestInfo}
+    </div>`;
+  }
+
+  document.getElementById('avail-ground').innerHTML = ground.map(makeCard).join('');
+  document.getElementById('avail-first').innerHTML  = first.map(makeCard).join('');
+
+  // Stats
+  const occ = activeBookings.length;
+  document.getElementById('stat-booked').textContent = occ;
+  document.getElementById('stat-free').textContent   = 8 - occ;
+}
+
+// ══════════════════════════════════════════════
+//  ROOM SELECTOR (booking page)
+// ══════════════════════════════════════════════
+function renderRooms(){
+  const activeOcc = bookings.filter(b=>b.status!=='vacated').map(b=>b.room);
+  const grid = document.getElementById('rooms-grid');
+  if(!grid) return;
+  grid.innerHTML = ROOMS.map(r=>{
+    const isOcc = activeOcc.includes(r.id);
+    const isSel = selectedRoom===r.id;
+    const badge = r.type==='suit'?t('suit-badge'):t('ac-badge');
+    const floorLabel = r.floor==='ground'?t('floor-ground'):t('floor-first');
+    return `
+    <div class="room-card ${r.type} ${isSel?'selected':''} ${isOcc?'occupied':''}"
+         onclick="${isOcc?'':  `selectRoom('${r.id}')`}">
+      <span class="room-badge">${badge}</span>
+      <div class="room-number">${r.id}</div>
+      <div class="room-lbl">${r.wing} · ${floorLabel}</div>
+      <div class="room-wing">${isOcc?'':''}</div>
+      ${isOcc?`<div class="occ-tag">${t('occ-label')}</div>`:`<div class="check-icon">✓</div>`}
+    </div>`;
+  }).join('');
+}
+
+function selectRoom(id){
+  selectedRoom = selectedRoom===id ? null : id;
+  document.getElementById('notice-text').innerHTML =
+    selectedRoom ? t('select-notice')(id) : t('notice-text');
+  renderRooms();
+}
+
+// ══════════════════════════════════════════════
+//  BOOKING CRUD
+// ══════════════════════════════════════════════
+function addBooking(){
+  if(!selectedRoom) return alert(lang==='ta'?'முதலில் ஒரு அறையை தேர்ந்தெடுக்கவும்!':'Please select a room first!');
+  const visitor=document.getElementById('f-visitor').value.trim();
+  const designation=document.getElementById('f-designation').value.trim();
+  const purpose=document.getElementById('f-purpose').value.trim();
+  const contact=document.getElementById('f-contact').value.trim();
+  const checkin=document.getElementById('f-checkin').value;
+  const checkout=document.getElementById('f-checkout').value;
+  const remarks=document.getElementById('f-remarks').value.trim();
+  if(!visitor||!checkin||!checkout) return alert(lang==='ta'?'பெயர், வருகை, புறப்படும் தேதி கட்டாயம்!':'Visitor name, check-in & check-out are required!');
+  const room=ROOMS.find(r=>r.id===selectedRoom);
+  const id=editId||Date.now().toString();
+  const booking={id,room:selectedRoom,type:room.type,floor:room.floor,wing:room.wing,
+    visitor,designation,purpose,contact,checkin,checkout,remarks,status:'active',
+    createdAt:new Date().toISOString()};
+  if(editId){ const idx=bookings.findIndex(b=>b.id===editId); if(idx!==-1) bookings[idx]=booking; editId=null; }
+  else bookings.push(booking);
+  save(); clearForm(); renderDashboard();
+  showPage('bookings');
+}
+
+function deleteBooking(id){
+  if(!confirm(lang==='ta'?'இந்த முன்பதிவை நீக்கவா?':'Delete this booking?')) return;
+  bookings=bookings.filter(b=>b.id!==id);
+  save(); renderDashboard(); renderBookings();
+}
+
+function editBooking(id){
+  const b=bookings.find(x=>x.id===id); if(!b) return;
+  editId=id;
+  // Remove from active so room shows free during edit
+  bookings=bookings.filter(x=>x.id!==id);
+  selectedRoom=b.room;
+  document.getElementById('f-visitor').value=b.visitor;
+  document.getElementById('f-designation').value=b.designation;
+  document.getElementById('f-purpose').value=b.purpose;
+  document.getElementById('f-contact').value=b.contact;
+  document.getElementById('f-checkin').value=b.checkin;
+  document.getElementById('f-checkout').value=b.checkout;
+  document.getElementById('f-remarks').value=b.remarks;
+  document.getElementById('notice-text').innerHTML=t('select-notice')(b.room);
+  showPage('booking');
+}
+
+function clearForm(){
+  selectedRoom=null; editId=null;
+  ['f-visitor','f-designation','f-purpose','f-contact','f-checkin','f-checkout','f-remarks']
+    .forEach(id=>document.getElementById(id).value='');
+  document.getElementById('notice-text').innerHTML=t('notice-text');
+  renderRooms();
+}
+
+// ══════════════════════════════════════════════
+//  VACATE
+// ══════════════════════════════════════════════
+function openVacate(id){
+  const b=bookings.find(x=>x.id===id); if(!b) return;
+  vacateId=id;
+  document.getElementById('vm-room').textContent='Room '+b.room;
+  document.getElementById('vm-guest').textContent=b.visitor+(b.designation?' · '+b.designation:'');
+  document.getElementById('vm-msg').textContent=t('vacate-msg')(b);
+  document.getElementById('vacate-modal').classList.add('open');
+}
+
+function confirmVacate(){
+  if(!vacateId) return;
+  const idx=bookings.findIndex(b=>b.id===vacateId);
+  if(idx!==-1){ bookings[idx].status='vacated'; bookings[idx].vacatedAt=new Date().toISOString(); }
+  vacateId=null;
+  save();
+  closeModal('vacate-modal');
+  renderDashboard();
+  renderBookings();
+}
+
+// ══════════════════════════════════════════════
+//  BOOKINGS TABLE
+// ══════════════════════════════════════════════
+function renderBookings(){
+  const tbody=document.getElementById('bookings-body'); if(!tbody) return;
+  if(!bookings.length){
+    tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;color:#aaa;padding:28px">${t('no-bookings-msg')}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=bookings.map((b,i)=>{
+    const typeTag=b.type==='suit'
+      ?`<span class="tag tag-suit">${t('suit-badge')}</span>`
+      :`<span class="tag tag-ac">${t('ac-badge')}</span>`;
+    const isVac=b.status==='vacated';
+    const statusTag=isVac
+      ?`<span class="tag tag-vac">${t('status-vacated')}</span>`
+      :`<span class="tag" style="background:#fef9c3;color:#713f12">${t('status-active')}</span>`;
+    const floorLabel=b.floor==='ground'?t('floor-ground'):t('floor-first');
+    return `<tr style="${isVac?'opacity:0.6':''}">
+      <td>${i+1}</td>
+      <td><strong>${b.room}</strong></td>
+      <td>${typeTag}</td>
+      <td style="font-size:0.8rem">${floorLabel}</td>
+      <td>${b.visitor}</td>
+      <td>${b.designation||'—'}</td>
+      <td>${fmtDT(b.checkin)}</td>
+      <td>${fmtDT(b.checkout)}</td>
+      <td>${statusTag}</td>
+      <td>
+        <div class="action-btns">
+          ${!isVac?`<button class="icon-btn" style="background:#fee2e2;color:#991b1b" onclick="openVacate('${b.id}')">🚪 ${t('btn-vacate')}</button>`:''}
+          <button class="icon-btn" style="background:#fef9c3;color:#713f12" onclick="printOrder('${b.id}')">🖨️ ${t('btn-print')}</button>
+          ${!isVac?`<button class="icon-btn" style="background:#dbeafe;color:#1e40af" onclick="editBooking('${b.id}')">✏️ ${t('btn-edit')}</button>`:''}
+          <button class="icon-btn" style="background:#fee2e2;color:#991b1b" onclick="deleteBooking('${b.id}')">🗑️ ${t('btn-delete')}</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  PRINT ORDER
+// ══════════════════════════════════════════════
+function printOrder(id){
+  const b=bookings.find(x=>x.id===id); if(!b) return;
+  const today=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  const refNo=`DC/CH/${b.room}/${new Date(b.createdAt).getFullYear()}/${id.slice(-4)}`;
+  const roomType=b.type==='suit'?'Suite Room':'AC Room';
+  const floorLabel=b.floor==='ground'?'Ground Floor':'First Floor';
+  const isTa=lang==='ta';
+
+  const doc=isTa?`
+  <div style="font-family:'Times New Roman',serif;font-size:13pt;line-height:1.7;color:#000">
+    <div style="text-align:center;border-bottom:3px double #000;padding-bottom:12px;margin-bottom:16px">
+      <div style="font-size:15pt;font-weight:bold">மாவட்ட ஆட்சியர் அலுவலகம், கடலூர்</div>
+      <div style="font-size:12pt">District Collector's Office, Cuddalore</div>
+      <div style="font-size:10pt;margin-top:4px">அரசு சர்க்கீட் ஹவுஸ், கடலூர்</div>
+      <div style="font-size:10pt;margin-top:8px;text-align:right">Ref. No: ${refNo}<br/>தேதி / Date: ${today}</div>
+    </div>
+    <div style="text-align:center;font-size:14pt;font-weight:bold;text-decoration:underline;margin:14px 0">
+      அறை ஒதுக்கீட்டு ஆணை &nbsp;/&nbsp; ROOM ALLOTMENT ORDER
+    </div>
+    <p>பின்வரும் விருந்தினருக்கு கீழ்கண்ட அறை ஒதுக்கீடு செய்யப்படுகிறது:</p>
+    <table style="width:100%;border-collapse:collapse;margin:14px 0;font-size:11pt">
+      <thead><tr>
+        <th style="border:1px solid #000;padding:6px 10px;background:#f5f5f5;text-align:center">வ.எண்</th>
+        <th style="border:1px solid #000;padding:6px 10px;background:#f5f5f5;text-align:center">விவரம்</th>
+        <th style="border:1px solid #000;padding:6px 10px;background:#f5f5f5;text-align:center">தகவல்</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">1</td><td style="border:1px solid #000;padding:6px 10px">பார்வையாளர் பெயர் / Visitor Name</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.visitor}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">2</td><td style="border:1px solid #000;padding:6px 10px">பதவி / Designation</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.designation||'—'}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">3</td><td style="border:1px solid #000;padding:6px 10px">வருகையின் நோக்கம் / Purpose</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.purpose||'—'}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">4</td><td style="border:1px solid #000;padding:6px 10px">தொடர்பு எண் / Contact</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.contact||'—'}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">5</td><td style="border:1px solid #000;padding:6px 10px">ஒதுக்கீடு செய்யப்பட்ட அறை / Room No.</td><td style="border:1px solid #000;padding:6px 10px;text-align:center"><strong>${b.room}</strong> (${roomType})</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">6</td><td style="border:1px solid #000;padding:6px 10px">பிரிவு / Wing</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.wing}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">7</td><td style="border:1px solid #000;padding:6px 10px">தளம் / Floor</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${floorLabel}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">8</td><td style="border:1px solid #000;padding:6px 10px">வருகை தேதி & நேரம் / Check-in</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${fmtDT(b.checkin)}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">9</td><td style="border:1px solid #000;padding:6px 10px">புறப்பாட்டு தேதி & நேரம் / Check-out</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${fmtDT(b.checkout)}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">10</td><td style="border:1px solid #000;padding:6px 10px">குறிப்புகள் / Remarks</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.remarks||'—'}</td></tr>
+      </tbody>
+    </table>
+    <p>சர்க்கீட் ஹவுஸ் நிர்வாகத்தினர் மேற்படி விருந்தினருக்கு தேவையான வசதிகளை செய்து தர கேட்டுக்கொள்ளப்படுகிறது.</p>
+    <div style="margin-top:40px;text-align:right">
+      <div style="margin-bottom:50px"></div>
+      <div style="font-weight:bold">ஆட்சியரின் தனிப்பட்ட உதவியாளர் (பொது)</div>
+      <div style="font-weight:bold">Personal Assistant to Collector (General)</div>
+      <div>மாவட்ட ஆட்சியர் அலுவலகம், கடலூர்</div>
+      <div>District Collector's Office, Cuddalore</div>
+    </div>
+    <div style="margin-top:22px;font-size:9pt;border-top:1px solid #aaa;padding-top:8px;color:#444">
+      படி: சர்க்கீட் ஹவுஸ் கேரட்டேக்கர் | Copy to: Circuit House Caretaker | கோப்பு / File
+    </div>
+  </div>`
+  :`
+  <div style="font-family:'Times New Roman',serif;font-size:13pt;line-height:1.7;color:#000">
+    <div style="text-align:center;border-bottom:3px double #000;padding-bottom:12px;margin-bottom:16px">
+      <div style="font-size:15pt;font-weight:bold;letter-spacing:0.05em">District Collector's Office, Cuddalore</div>
+      <div style="font-size:12pt;margin-top:3px">Government Circuit House, Cuddalore</div>
+      <div style="font-size:10pt;margin-top:8px;text-align:right">Ref. No: ${refNo}<br/>Date: ${today}</div>
+    </div>
+    <div style="text-align:center;font-size:14pt;font-weight:bold;text-decoration:underline;margin:14px 0">ROOM ALLOTMENT ORDER</div>
+    <p>The following room is hereby allotted to the honoured guest as detailed below:</p>
+    <table style="width:100%;border-collapse:collapse;margin:14px 0;font-size:11pt">
+      <thead><tr>
+        <th style="border:1px solid #000;padding:6px 10px;background:#f5f5f5;text-align:center">S.No</th>
+        <th style="border:1px solid #000;padding:6px 10px;background:#f5f5f5;text-align:center">Particulars</th>
+        <th style="border:1px solid #000;padding:6px 10px;background:#f5f5f5;text-align:center">Details</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">1</td><td style="border:1px solid #000;padding:6px 10px">Visitor Name</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.visitor}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">2</td><td style="border:1px solid #000;padding:6px 10px">Designation / Rank</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.designation||'—'}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">3</td><td style="border:1px solid #000;padding:6px 10px">Purpose of Visit</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.purpose||'—'}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">4</td><td style="border:1px solid #000;padding:6px 10px">Contact Number</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.contact||'—'}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">5</td><td style="border:1px solid #000;padding:6px 10px">Allotted Room No.</td><td style="border:1px solid #000;padding:6px 10px;text-align:center"><strong>${b.room}</strong> (${roomType})</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">6</td><td style="border:1px solid #000;padding:6px 10px">Wing</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.wing}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">7</td><td style="border:1px solid #000;padding:6px 10px">Floor</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${floorLabel}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">8</td><td style="border:1px solid #000;padding:6px 10px">Check-in Date &amp; Time</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${fmtDT(b.checkin)}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">9</td><td style="border:1px solid #000;padding:6px 10px">Check-out Date &amp; Time</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${fmtDT(b.checkout)}</td></tr>
+        <tr><td style="border:1px solid #000;padding:6px 10px;text-align:center">10</td><td style="border:1px solid #000;padding:6px 10px">Remarks</td><td style="border:1px solid #000;padding:6px 10px;text-align:center">${b.remarks||'—'}</td></tr>
+      </tbody>
+    </table>
+    <p>The Circuit House staff are requested to extend all necessary facilities and courtesies to the above mentioned guest during their stay.</p>
+    <div style="margin-top:40px;text-align:right">
+      <div style="margin-bottom:50px"></div>
+      <div style="font-weight:bold;font-size:11pt">Personal Assistant to Collector (General)</div>
+      <div style="font-size:10.5pt">District Collector's Office, Cuddalore</div>
+    </div>
+    <div style="margin-top:22px;font-size:9pt;border-top:1px solid #aaa;padding-top:8px;color:#444">
+      Copy to: Circuit House Caretaker | File
+    </div>
+  </div>`;
+
+  document.getElementById('print-doc').innerHTML=doc;
+  document.getElementById('print-modal').classList.add('open');
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+document.getElementById('print-modal').addEventListener('click',function(e){ if(e.target===this) closeModal('print-modal'); });
+document.getElementById('vacate-modal').addEventListener('click',function(e){ if(e.target===this) closeModal('vacate-modal'); });
+
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+function fmtDT(str){
+  if(!str) return '—';
+  const d=new Date(str);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+function fmtDate(str){
+  if(!str) return '—';
+  return new Date(str).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+function save(){ localStorage.setItem('ch-bookings2',JSON.stringify(bookings)); }
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+const now=new Date();
+const pad=n=>String(n).padStart(2,'0');
+document.getElementById('f-checkin').value=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+const tom=new Date(now.getTime()+86400000);
+document.getElementById('f-checkout').value=`${tom.getFullYear()}-${pad(tom.getMonth()+1)}-${pad(tom.getDate())}T${pad(tom.getHours())}:${pad(tom.getMinutes())}`;
+
+renderDashboard();
+renderRooms();
+renderBookings();
+</script>
+</body>
+</html>
